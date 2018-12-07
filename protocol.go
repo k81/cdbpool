@@ -7,7 +7,7 @@ import (
 	"sync/atomic"
 
 	"github.com/golang/protobuf/proto"
-	"github.com/k81/kate/knet"
+	"github.com/k81/knet"
 )
 
 type Header struct {

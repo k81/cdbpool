@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"sync/atomic"
 
-	"github.com/k81/kate/knet"
 	"github.com/k81/kate/log"
+	"github.com/k81/knet"
 )
 
 var nextConnId = uint64(0)
