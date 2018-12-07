@@ -1,0 +1,267 @@
+// See README.txt for information and build instructions.
+syntax = "proto3";
+
+package cdbpool;
+
+enum ResultCode {
+    RC_SUCCESS          = 0;
+    RC_BAD_COMMAND      = 1;
+    RC_NO_CMD_REQ       = 2;
+    RC_NO_BAD_ARGUMENTS = 3;
+    RC_BAD_VSID         = 4;
+
+    RC_DB_ERROR         = 110;
+    RC_INTERNAL_ERROR   = 5000;
+
+	RC_DB_BAD_VSID	    = 1001;
+	RC_DB_NO_SUCH_DB	= 1002;
+	RC_DB_DB_NOT_WORK	= 1003;
+	RC_DB_POOL_IS_FULL	= 1004;
+	RC_DB_CONNECTION	= 1005;
+	RC_DB_MYSQL_QUERY	= 1006;
+	RC_DB_GET_SQL		= 1007;
+}
+
+enum ValueType {
+	VALUE_TYPE_INVALID  = 0;
+	VALUE_TYPE_INTEGER  = 1;
+	VALUE_TYPE_STRING   = 2;
+	VALUE_TYPE_FLOAT    = 3;
+	VALUE_TYPE_TIME     = 4;
+
+	VALUE_TYPE_UNKNOWN  = 255;
+}
+
+
+//单个元素，键-值-类型  三元组
+message KVPair {
+	string key          = 1;
+	string value        = 2;
+	ValueType type      = 3;
+}
+
+//条件判断，键 值 类型 操作符
+message CondPair {
+    string key          = 1;
+    string value        = 2;
+    ValueType type      = 3;
+    string condition    = 4;
+}
+
+
+//单条对象，包含多个kvp对,对应sql的一行
+message StoreRecord {
+	repeated KVPair units   = 1;
+}
+
+message ValueList {
+	repeated string values  = 1;
+}
+
+//-----INSERT------------
+message InsertRequest {
+	string table        = 1;
+	string dbname       = 2;
+	StoreRecord record  = 3;
+}
+
+message MulInsertRequest {
+	string dbname                   = 1;
+	string table                    = 2;
+	repeated string columns         = 3;
+	repeated ValueList valuelists   = 4;
+}
+
+message InsertResponse {
+	uint64 bigid            = 1;
+	uint64 last_insertid    = 2;
+	uint32 affect_rows      = 3;
+}
+//-----------------------
+
+//-----SELECT------------
+message SelectRequest {
+	string dbname               = 1;
+    string table                = 2;
+    repeated string columns     = 3;
+    repeated CondPair filter    = 4;
+    string filter_type          = 5;
+    string orderby              = 6;
+    string limit                = 7;
+	int32 forupdate             = 8;
+	string complex_filter       = 9;
+}
+
+message SelectResponse {
+	repeated StoreRecord records = 1;
+}
+//-----------------------
+//-----DELETE------------
+message DeleteRequest {
+	string dbname               = 1;
+	string table                = 2;
+    repeated CondPair filter    = 3;
+    string filter_type          = 4;
+}
+
+message DeleteResponse {
+	uint64 bigid                = 1;
+	uint32 affect_rows          = 2;
+}
+//-----------------------
+//-----UPDATE------------
+message UpdateRequest {
+	string dbname               = 1;
+	string table                = 2;
+    repeated KVPair records     = 3;
+    repeated CondPair filter    = 4;
+    string filter_type          = 5;
+}
+
+message UpdateResponse {
+	uint64 bigid                = 1;
+	uint32 affect_rows          = 2; 
+    uint64 last_insertid        = 3;
+}
+
+//original statement protocal 
+
+//ori select
+message OriSelectRequest {
+	string dbname               = 1;
+    string table                = 2;
+    string columns              = 3;
+	string complex_filter       = 4;
+    string orderby              = 5;
+    string limit                = 6;
+	int32 forupdate             = 7;
+}
+//ori insert
+message OriInsertRequest {
+	string dbname               = 1;
+	string table                = 2;
+	string columns              = 3;
+	string values               = 4;
+}
+//ori update
+message OriUpdateRequest {
+	string dbname               = 1;
+	string table                = 2;
+	string sets                 = 3;
+	string complex_filter       = 4;
+}
+//-----------------------
+//ori show
+message OriShowRequest {
+	string dbname               = 1;
+	string content              = 2;
+}
+
+message OriShowResponse {
+	repeated StoreRecord records    = 1;
+}
+
+//ori delete
+message OriDeleteRequest {
+	string dbname               = 1;
+	string table                = 2;
+	string complex_filter       = 3;
+}
+//-----------------------
+
+//----transfer begin commit rollback
+message TransferRequest {
+	string dbname               = 1;
+	string command              = 2;
+}
+message TransferResponse {
+	uint64 bigid                = 1;
+}
+
+//-----------------------
+//-----UPDATE------------
+message ServerStatsRequest {
+	int32 tmp                   = 1;
+}
+
+message ServerStatsResponse {
+	repeated KVPair stats       = 1;
+}
+
+message MysqlStatsResponse {
+	string stats_str            = 1;
+}
+
+
+message ReloadMysqlRequest {
+	string reload               = 1;
+}
+
+//-----------------------
+
+
+
+message MysqlInfo {
+	string sql                  = 1;
+	string mysql_ip             = 2;
+	int32 mysql_port            = 3;
+	string dbname               = 4;
+	int32 vsid                  = 5;
+    uint32 mysql_errno          = 6;
+}
+
+
+//===========================================================
+message CdbPoolRequest {
+	string logid                                = 1;
+	string command                              = 2;
+	uint64 bigid                                = 3;
+	bool need_sql_info                          = 4;
+	bool request_offline_mysql                  = 5;
+
+//    CMD_SELECT = 1;
+//    CMD_INSERT = 2;
+//    CMD_DELETE = 3;
+//    CMD_UPDATE = 4;
+//    CMD_REPLACE = 5;
+//    CMD_COUNT = 6;
+
+    oneof req {
+        ServerStatsRequest stats_req            = 10;
+        SelectRequest select_req                = 11;
+        InsertRequest insert_req                = 12;
+        DeleteRequest delete_req                = 13;
+        UpdateRequest update_req                = 14;
+        MulInsertRequest mulinsert_req          = 15;
+        OriSelectRequest ori_select_req         = 21;
+        OriInsertRequest ori_insert_req         = 22;
+        OriDeleteRequest ori_delete_req         = 23;
+        OriUpdateRequest ori_update_req         = 24;
+        OriShowRequest ori_show_req             = 25;
+        TransferRequest transfer_req            = 35;
+        ReloadMysqlRequest reload_mysql_req     = 36;
+    }
+}
+
+
+message CdbPoolResponse {
+	int32 error                                 = 1;
+	string err_msg                              = 2;
+
+	string command                              = 3;
+	string logid                                = 4;
+	MysqlInfo sql_info                          = 5;
+
+    oneof resp {
+        ServerStatsResponse stats_resp          = 10;
+        SelectResponse select_resp              = 11;
+        InsertResponse insert_resp              = 12;
+        DeleteResponse delete_resp              = 13;
+        UpdateResponse update_resp              = 14;
+        TransferResponse transfer_resp          = 15;
+        MysqlStatsResponse mysql_stats_resp     = 16;
+        OriShowResponse ori_show_resp           = 17;
+    }
+}
+//===========================================================
+
