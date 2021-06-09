@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/k81/kate/orm"
+	"github.com/std0d9k81/kate/orm"
 )
 
 type OrderInfo struct {

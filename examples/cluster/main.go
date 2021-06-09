@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/k81/cdbpool"
+	"github.com/std0d9k81/cdbpool"
 )
 
 var (

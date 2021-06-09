@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/k81/kate/bigid"
-	"github.com/k81/kate/log"
-	"github.com/k81/sqlparser"
-	"github.com/k81/kate/utils"
+	"github.com/std0d9k81/kate/bigid"
+	"github.com/std0d9k81/kate/log"
+	"github.com/std0d9k81/sqlparser"
+	"github.com/std0d9k81/kate/utils"
 )
 
 type selectExecutor struct {

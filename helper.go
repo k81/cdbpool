@@ -5,7 +5,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 
-	"github.com/k81/sqlparser"
+	"github.com/std0d9k81/sqlparser"
 )
 
 func driverArgs(args []driver.Value) []driver.NamedValue {

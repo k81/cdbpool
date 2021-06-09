@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/k81/sqlparser"
+	"github.com/std0d9k81/sqlparser"
 )
 
 var (

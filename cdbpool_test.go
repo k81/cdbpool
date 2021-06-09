@@ -7,7 +7,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/k81/kate/bigid"
+	"github.com/std0d9k81/kate/bigid"
 )
 
 var (

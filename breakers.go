@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/k81/kate/log"
+	"github.com/std0d9k81/kate/log"
 	"github.com/sony/gobreaker"
 )
 
